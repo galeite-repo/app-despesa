@@ -1,0 +1,66 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Adicionar Categoria
+            </h3>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                &times;
+            </button>
+        </div>
+        <form class="max-w-md mx-auto" [formGroup]="form" (ngSubmit)="add()">
+            <div class="py-4 text-gray-600 dark:text-gray-300">
+
+                <div class="relative z-0 w-full mb-1 group flex items-center">
+                    <input #categoriaInput type="text" name="categoria" id="categoria" formControlName="categoria"
+                        class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        placeholder="Nova Categoria" required />
+                </div>
+            </div>
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg py-4 mb-4">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                Categoria
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (item of data; track item) {
+                        <tr
+                            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td class="px-6 py-4">
+                                {{item.categoria}}
+                            </td>
+                            <td class="px-6 py-4">
+                                <a (click)="edit(item)"
+                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">Editar</a>
+                            </td>
+                        </tr>
+                        }@empty {
+                        <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td class="px-6 py-4" colspan="5">
+                                <p class="text-center">Nenhuma categoria cadastrada...</p>
+                            </td>
+                        </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button (click)="closeModal()" class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">
+                    Cancelar
+                </button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" type="submit"
+                    [disabled]="!form.valid">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
