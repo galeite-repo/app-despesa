@@ -1,12 +1,13 @@
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { NgIf } from '@angular/common';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [],
+  imports: [NgIf],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })

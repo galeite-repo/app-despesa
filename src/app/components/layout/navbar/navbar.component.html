@@ -1,11 +1,11 @@
 <nav class="bg-white border-gray-200 dark:bg-gray-900">
     <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
         <a href="https://flowbite.com" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Minhas Despesas</span>
+            <img src="https://cdn-icons-png.flaticon.com/512/781/781760.png" class="h-8" alt="Flowbite Logo" />
+            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Despesas</span>
         </a>
         <div class="flex items-center space-x-6 rtl:space-x-reverse">
-            <a href="tel:5541251234" class="text-sm  text-gray-500 dark:text-white hover:underline">{{userData.name ??
+            <a *ngIf="userData" href="tel:5541251234" class="text-sm  text-gray-500 dark:text-white hover:underline">{{userData.name ??
                 userData.email}}</a>
             <a href="#" class="text-sm  text-blue-600 dark:text-blue-500 hover:underline" (click)="logout()">Logout</a>
         </div>
@@ -18,9 +18,9 @@
                 <li>
                     <a href="#" class="text-gray-900 dark:text-white hover:underline" aria-current="page">Home</a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="dashboard" class="text-gray-900 dark:text-white hover:underline">Dashboard</a>
-                </li>
+                </li> -->
                 
             </ul>
         </div>

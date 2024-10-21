@@ -1,0 +1,30 @@
+<div>
+    <h2>Relatórios de Despesas</h2>
+  
+    <div id="categoryChart" class="chart-container">
+      <apx-chart
+        [series]="categoryChartOptions.series"
+        [chart]="categoryChartOptions.chart"
+        [xaxis]="categoryChartOptions.xaxis"
+        [title]="categoryChartOptions.title">
+      </apx-chart>
+    </div>
+  
+    <div id="periodChart" class="chart-container">
+      <apx-chart
+        [series]="periodChartOptions.series"
+        [chart]="periodChartOptions.chart"
+        [xaxis]="periodChartOptions.xaxis"
+        [title]="periodChartOptions.title">
+      </apx-chart>
+    </div>
+  
+    <div id="recurrentChart" class="chart-container">
+      <apx-chart
+        [series]="recurrentChartOptions.series"
+        [chart]="recurrentChartOptions.chart"
+        [labels]="recurrentChartOptions.labels"
+        [title]="recurrentChartOptions.title">
+      </apx-chart>
+    </div>
+  </div>

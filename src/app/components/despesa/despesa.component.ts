@@ -11,6 +11,7 @@ import { AlertComponent } from "../../shared/components/alert/alert.component";
 import { Despesa, DespesasService } from '../service/despesas.service';
 import { InputMaskDirective } from '../../shared/directives/InputMaskDirective';
 import { MoneyMaskDirective } from '../../shared/directives/MoneyMaskDirective';
+import { ChartComponent } from './chart/chart.component';
 
 interface DespesaForm {
   recorrente: FormControl<boolean | null>;
@@ -29,7 +30,7 @@ interface DespesaForm {
   templateUrl: './despesa.component.html',
   styleUrl: './despesa.component.scss'
 })
-export class DespesaComponent implements  OnInit {
+export class DespesaComponent implements OnInit {
   @ViewChild('dataInput') dataInput!: ElementRef; // Cria a referência
 
   @ViewChild(AlertComponent) alertComponent!: AlertComponent;
@@ -44,9 +45,11 @@ export class DespesaComponent implements  OnInit {
   despesaService = inject(DespesasService);
   despesaList: Despesa[] = [];
   despesaFixa: Despesa[] = [];
+  despesaGeral: Despesa[] = [];
   totalDespesa: number = 0;
   totalDespesaFixa: number = 0;
   totalFinal: number = 0;
+  totalGeral: number = 0;
 
   mesSelecionado: any;
   anoSelecionado: any;
@@ -117,7 +120,7 @@ export class DespesaComponent implements  OnInit {
       recorrente: this.despesaSelected.recorrente,
       valor: this.despesaSelected.valor
     })
-    console.log(this.form.value)
+    this.focusOnInput();
   }
 
 
@@ -170,19 +173,25 @@ export class DespesaComponent implements  OnInit {
   async loadData(mes: number, ano: number) {
     this.despesaList = [];
     this.despesaFixa = [];
+    this.despesaGeral = [];
     this.totalDespesa = 0;
     this.totalDespesaFixa = 0;
     await this.categoriaService.getAll();
+    await this.despesaService.getAllGeral(mes, ano);
     await this.despesaService.getAll(mes, ano);
     await this.despesaService.getAllFixas(mes, ano);
     this.categoriaList = this.categoriaService.categorias();
     this.despesaList = this.despesaService.despesas();
+    this.despesaGeral = this.despesaService.despesasGeral();
     this.despesaFixa = this.despesaService.despesasFixas();
     this.despesaList.map((item) => {
       this.totalDespesa += item.valor
     })
     this.despesaFixa.map((item) => {
       this.totalDespesaFixa += item.valor
+    })
+    this.despesaGeral.map((item) => {
+      this.totalGeral += item.valor
     })
     this.totalFinal = this.totalDespesa + this.totalDespesaFixa
   }
@@ -197,6 +206,16 @@ export class DespesaComponent implements  OnInit {
           this.alertComponent.showAlert("Sucesso", "Adicionado com sucesso!");
           await this.loadData(this.mesSelecionado, this.anoSelecionado);
         }
+      }
+    });
+  }
+
+  openChartModal(): void {
+    this.modalService.openModal({
+      component: ChartComponent,
+      inputs: {
+        data: this.despesaGeral,
+        total: this.totalGeral
       }
     });
   }

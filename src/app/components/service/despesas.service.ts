@@ -16,6 +16,7 @@ export interface Despesa {
 interface DespesaState {
   despesas: Despesa[];
   despesasFixas: Despesa[];
+  despesasGeral: Despesa[];
   loading: boolean;
   error: boolean;
 }
@@ -27,6 +28,7 @@ export class DespesasService {
 
   private _state = signal<DespesaState>({
     despesas: [],
+    despesasGeral: [],
     despesasFixas: [],
     loading: false,
     error: false,
@@ -34,9 +36,53 @@ export class DespesasService {
 
   despesas = computed(() => this._state().despesas);
   despesasFixas = computed(() => this._state().despesasFixas);
+  despesasGeral = computed(() => this._state().despesasGeral);
   loading = computed(() => this._state().loading);
   error = computed(() => this._state().error);
 
+
+  async getAllGeral(mes: number, ano: number) {
+    this._state.update((state) => ({
+      ...state,
+      despesasGeral: [],
+    }));
+    const inicioDoMes = new Date(ano, mes - 1, 1).toISOString().split('T')[0];
+    // Último dia do mês
+    const fimDoMes = new Date(ano, mes, 0).toISOString().split('T')[0];
+    try {
+      this._state.update((state) => ({
+        ...state,
+        loading: true,
+      }));
+      const {
+        data: { session },
+      } = await this._authService.session();
+      const { data } = await this._supabaseClient
+        .from('despesa')
+        .select(`*, categoria(*)`)
+        .eq('user_id', session?.user.id)
+        .gte('data', inicioDoMes)
+        .lte('data', fimDoMes)
+        .order('data', { ascending: false })
+        .returns<Despesa[]>();
+      if (data && data.length > 0) {
+        this._state.update((state) => ({
+          ...state,
+          despesasGeral: data,
+        }));
+      }
+    } catch (error) {
+      this._state.update((state) => ({
+        ...state,
+        error: true,
+      }));
+    } finally {
+      this._state.update((state) => ({
+        ...state,
+        loading: false,
+      }));
+    }
+  }
   async getAll(mes: number, ano: number) {
     this._state.update((state) => ({
       ...state,
