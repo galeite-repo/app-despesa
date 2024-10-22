@@ -33,6 +33,7 @@ export class CategoriasService {
       this._state.update((state) => ({
         ...state,
         loading: true,
+        categorias: []
       }));
       const {
         data: { session },

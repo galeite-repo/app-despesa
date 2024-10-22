@@ -12,6 +12,7 @@ import { Despesa, DespesasService } from '../service/despesas.service';
 import { InputMaskDirective } from '../../shared/directives/InputMaskDirective';
 import { MoneyMaskDirective } from '../../shared/directives/MoneyMaskDirective';
 import { ChartComponent } from './chart/chart.component';
+import { DeleteComponent } from './delete/delete.component';
 
 interface DespesaForm {
   recorrente: FormControl<boolean | null>;
@@ -220,4 +221,15 @@ export class DespesaComponent implements OnInit {
     });
   }
 
+  deleteModal(despesa: Despesa): void {
+    this.modalService.openModal({
+      component: DeleteComponent,
+      inputs: {
+        data: despesa,
+        onDelete: async (despesa: Despesa) => {
+          this.deleteItem(despesa)
+        }
+      }
+    });
+  }
 }

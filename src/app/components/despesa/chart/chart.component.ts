@@ -39,7 +39,6 @@ export class ChartComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data)
     if(this.data.length <=0){
       this.showData = false
     }else{

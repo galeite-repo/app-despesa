@@ -23,9 +23,7 @@ export class AddComponent implements AfterViewInit {
     private modalService: ModalService,
     @Inject("data") public data: any,
     @Optional() @Inject('onCreate') public onCreate: () => void = () => { },
-  ) {
-
-  }
+  ) {}
   private formBuilder = inject(FormBuilder);
 
   categoria!: Categoria;
