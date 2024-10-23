@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { format, formatDate, getMonth, getYear, setMonth } from 'date-fns';
-import { initFlowbite } from 'flowbite';
+import { Datepicker, initFlowbite } from 'flowbite';
 import { NavbarComponent } from "../layout/navbar/navbar.component";
 import { Categoria, CategoriasService } from '../service/categoria.service';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -15,12 +15,12 @@ import { ChartComponent } from './chart/chart.component';
 import { DeleteComponent } from './delete/delete.component';
 
 interface DespesaForm {
-  recorrente: FormControl<boolean | null>;
-  data: FormControl<string | null>;
-  valor: FormControl<number | null>;
-  descricao: FormControl<string | null>;
-  categoria: FormControl<Categoria | null>;
-  categoria_id: FormControl<string | null>;
+  recorrente?: FormControl<boolean | null>;
+  data?: FormControl<string | null>;
+  valor?: FormControl<number | null>;
+  descricao?: FormControl<string | null>;
+  categoria?: FormControl<Categoria | null>;
+  categoria_id?: FormControl<string | null>;
 }
 
 
@@ -31,8 +31,9 @@ interface DespesaForm {
   templateUrl: './despesa.component.html',
   styleUrl: './despesa.component.scss'
 })
-export class DespesaComponent implements OnInit {
-  @ViewChild('dataInput') dataInput!: ElementRef; // Cria a referência
+export class DespesaComponent implements OnInit, AfterViewInit {
+  @ViewChild('dataInput') dataInput!: ElementRef;
+  selectedDate!: string;
 
   @ViewChild(AlertComponent) alertComponent!: AlertComponent;
   private modalService = inject(ModalService);
@@ -65,8 +66,26 @@ export class DespesaComponent implements OnInit {
     valor: this.formBuilder.control(null, Validators.required),
   });
 
+  ngAfterViewInit(): void {
+    const datepickerEl = document.getElementById('datepicker');
+
+    if (datepickerEl) {
+      const datepicker = new Datepicker(datepickerEl, {
+        autohide: true,
+        format: 'dd-mm-yyyy'
+      });
+
+      datepickerEl.addEventListener('changeDate', (event: any) => {
+        const selectedDate = event.detail.date;
+        this.form.patchValue({
+          data: format(selectedDate, "dd-MM-yyyy")
+        });
+      });
+    }
+  }
 
   async ngOnInit() {
+    this.selectedDate = '';
     const savedToggleEye = localStorage.getItem('toggleEye');
     if (savedToggleEye !== null) {
       this.toggleEye = JSON.parse(savedToggleEye);
@@ -76,16 +95,14 @@ export class DespesaComponent implements OnInit {
     this.anoSelecionado = getYear(new Date());
     await this.loadData(this.mesSelecionado, this.anoSelecionado);
     initFlowbite();
-    this.focusOnInput();
 
   }
   private focusOnInput() {
-    // Usando setTimeout para garantir que o elemento esteja renderizado
     setTimeout(() => {
       if (this.dataInput) {
         this.dataInput.nativeElement.focus();
       }
-    }, 0); // O atraso pode ser 0 para que seja executado no próximo ciclo de eventos
+    }, 0); 
   }
 
   toggleView() {
@@ -94,6 +111,7 @@ export class DespesaComponent implements OnInit {
 
   }
   async onSelecionaMes(mes: any) {
+    console.log(mes)
     const inputElement = mes.target as HTMLInputElement;
     const value = inputElement.value;
     this.mesSelecionado = value
@@ -157,7 +175,6 @@ export class DespesaComponent implements OnInit {
       descricao: null,
       valor: null
     });
-    this.focusOnInput()
   }
 
   async deleteItem(item: Despesa) {
