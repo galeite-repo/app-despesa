@@ -147,7 +147,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       recorrente: this.despesaSelected.recorrente,
       valor: this.despesaSelected.valor
     })
-    this.focusOnInput();
+    this.focusOnDescricao();
   }
 
 
