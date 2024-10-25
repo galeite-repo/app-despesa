@@ -33,6 +33,7 @@ interface DespesaForm {
 })
 export class DespesaComponent implements OnInit, AfterViewInit {
   @ViewChild('dataInput') dataInput!: ElementRef;
+  @ViewChild('descricaoInput') descricaoInput!: ElementRef;
   selectedDate!: string;
 
   @ViewChild(AlertComponent) alertComponent!: AlertComponent;
@@ -104,6 +105,13 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       }
     }, 0); 
   }
+  private focusOnDescricao() {
+    setTimeout(() => {
+      if (this.descricaoInput) {
+        this.descricaoInput.nativeElement.focus();
+      }
+    }, 0); 
+  }
 
   toggleView() {
     this.toggleEye = !this.toggleEye;
@@ -163,6 +171,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       this.alertComponent.showAlert("Erro", "Algo deu errado");
 
     }
+    this.focusOnDescricao()
     await this.loadData(this.mesSelecionado, this.anoSelecionado);
   }
 
