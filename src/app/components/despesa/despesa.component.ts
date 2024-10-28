@@ -13,6 +13,9 @@ import { InputMaskDirective } from '../../shared/directives/InputMaskDirective';
 import { MoneyMaskDirective } from '../../shared/directives/MoneyMaskDirective';
 import { ChartComponent } from './chart/chart.component';
 import { DeleteComponent } from './delete/delete.component';
+import flatpickr from 'flatpickr';
+import { Portuguese } from 'flatpickr/dist/l10n/pt.js'; // Importe o idioma desejado
+
 
 interface DespesaForm {
   recorrente?: FormControl<boolean | null>;
@@ -32,6 +35,8 @@ interface DespesaForm {
   styleUrl: './despesa.component.scss'
 })
 export class DespesaComponent implements OnInit, AfterViewInit {
+  @ViewChild('datePicker') datePickerElement!: ElementRef;
+  flatpickrInstance: flatpickr.Instance | undefined
   @ViewChild('dataInput') dataInput!: ElementRef;
   @ViewChild('descricaoInput') descricaoInput!: ElementRef;
   selectedDate!: string;
@@ -68,21 +73,10 @@ export class DespesaComponent implements OnInit, AfterViewInit {
   });
 
   ngAfterViewInit(): void {
-    const datepickerEl = document.getElementById('datepicker');
-
-    if (datepickerEl) {
-      const datepicker = new Datepicker(datepickerEl, {
-        autohide: true,
-        format: 'dd-mm-yyyy'
-      });
-
-      datepickerEl.addEventListener('changeDate', (event: any) => {
-        const selectedDate = event.detail.date;
-        this.form.patchValue({
-          data: format(selectedDate, "dd-MM-yyyy")
-        });
-      });
-    }
+    this.flatpickrInstance = flatpickr(this.datePickerElement.nativeElement, {
+      dateFormat: 'd-m-Y',
+      locale: Portuguese 
+    });
   }
 
   async ngOnInit() {
@@ -98,13 +92,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
     initFlowbite();
 
   }
-  private focusOnInput() {
-    setTimeout(() => {
-      if (this.dataInput) {
-        this.dataInput.nativeElement.focus();
-      }
-    }, 0); 
-  }
+
   private focusOnDescricao() {
     setTimeout(() => {
       if (this.descricaoInput) {
@@ -162,6 +150,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
         this.alertComponent.showAlert("Alerta", "Despesa atualizada!");
         this.resetForm();
         this.despesaSelected = undefined;
+        
       } else {
         await this.despesaService.insert(this.despesa)
         this.alertComponent.showAlert("Sucesso", "Adicionado com sucesso!");
@@ -184,6 +173,9 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       descricao: null,
       valor: null
     });
+    if (this.flatpickrInstance) {
+      this.flatpickrInstance.clear();
+    }
   }
 
   async deleteItem(item: Despesa) {

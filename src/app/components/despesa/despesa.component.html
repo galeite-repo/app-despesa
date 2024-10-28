@@ -26,7 +26,7 @@
                 </div>
                 <div class="flex justify-start text-center items-center gap-4 w-full sm:w-auto">
                     <div class="flex items-center w-full sm:w-auto ">
-                        <select  [(ngModel)]="mesSelecionado" (change)="onSelecionaMes($event)"
+                        <select [(ngModel)]="mesSelecionado" (change)="onSelecionaMes($event)"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-primary-500 focus:border-primary-500 block w-60 md:w-52 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="1">Janeiro</option>
                             <option value="2">Fevereiro</option>
@@ -59,7 +59,8 @@
             <form class="flex flex-wrap items-center gap-4 mb-6 justify-between" [formGroup]="form" (ngSubmit)="add()">
                 <div class="w-full sm:w-auto mt-4 ">
                     <label class="inline-flex items-center cursor-pointer">
-                        <input autocomplete="off" type="checkbox" value="" class="sr-only peer" formControlName="recorrente">
+                        <input autocomplete="off" type="checkbox" value="" class="sr-only peer"
+                            formControlName="recorrente">
                         <div
                             class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
                         </div>
@@ -101,8 +102,10 @@
                        <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                      </svg>
                  </div>
-                 <input autocomplete="off" #dataInput type="text" id="datepicker" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Selecione a data" formControlName="data"/>
+                 <input formControlName="data" #datePicker placeholder="Selecione uma data"
+                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                </div>
+
                 <div class="w-full sm:w-auto">
                     <input autocomplete="off" type="text" id="valor" formControlName="valor" appMoneyMask
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
