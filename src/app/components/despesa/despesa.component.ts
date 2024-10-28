@@ -19,6 +19,7 @@ import { Portuguese } from 'flatpickr/dist/l10n/pt.js'; // Importe o idioma dese
 
 interface DespesaForm {
   recorrente?: FormControl<boolean | null>;
+  status?: FormControl<boolean | null>;
   data?: FormControl<string | null>;
   valor?: FormControl<number | null>;
   descricao?: FormControl<string | null>;
@@ -45,6 +46,8 @@ export class DespesaComponent implements OnInit, AfterViewInit {
   private modalService = inject(ModalService);
 
   toggleEye: boolean = false;
+  buscaDespesaFixa: string = '';
+  buscaDespesaGeral: string = '';
 
   despesa!: Despesa;
   despesaSelected?: Despesa;
@@ -66,6 +69,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
   form = this.formBuilder.group<DespesaForm>({
     descricao: this.formBuilder.control(null, Validators.required),
     recorrente: this.formBuilder.control(false, Validators.required),
+    status: this.formBuilder.control(false, Validators.required),
     categoria: this.formBuilder.control(null),
     categoria_id: this.formBuilder.control(null, Validators.required),
     data: this.formBuilder.control(null, Validators.required),
@@ -75,7 +79,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.flatpickrInstance = flatpickr(this.datePickerElement.nativeElement, {
       dateFormat: 'd-m-Y',
-      locale: Portuguese 
+      locale: Portuguese
     });
   }
 
@@ -98,7 +102,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       if (this.descricaoInput) {
         this.descricaoInput.nativeElement.focus();
       }
-    }, 0); 
+    }, 0);
   }
 
   toggleView() {
@@ -107,11 +111,36 @@ export class DespesaComponent implements OnInit, AfterViewInit {
 
   }
   async onSelecionaMes(mes: any) {
-    console.log(mes)
     const inputElement = mes.target as HTMLInputElement;
     const value = inputElement.value;
     this.mesSelecionado = value
     await this.loadData(this.mesSelecionado, this.anoSelecionado);
+  }
+
+  filteredDespesaFixa() {
+    const term = this.buscaDespesaFixa.toLowerCase();
+
+    return this.despesaFixa.filter(item => {
+      const matchesDescricao = item.descricao.toLowerCase().includes(term);
+      const matchesCategoria = item.categoria?.categoria.toLowerCase().includes(term);
+      const matchesValor = item.valor.toString().includes(term);
+      const matchesData = item.data === this.buscaDespesaFixa;
+
+      return matchesDescricao || matchesCategoria || matchesValor || matchesData;
+    });
+  }
+
+  filteredDespesaGeral() {
+    const term = this.buscaDespesaGeral.toLowerCase();
+
+    return this.despesaList.filter(item => {
+      const matchesDescricao = item.descricao.toLowerCase().includes(term);
+      const matchesCategoria = item.categoria?.categoria.toLowerCase().includes(term);
+      const matchesValor = item.valor.toString().includes(term);
+      const matchesData = item.data === this.buscaDespesaFixa;
+
+      return matchesDescricao || matchesCategoria || matchesValor || matchesData;
+    });
   }
 
 
@@ -133,11 +162,18 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       descricao: this.despesaSelected.descricao,
       data: this.formatDateBR(this.despesaSelected.data),
       recorrente: this.despesaSelected.recorrente,
+      status: this.despesaSelected.status ?? false,
       valor: this.despesaSelected.valor
     })
     this.focusOnDescricao();
   }
 
+  recorrenciaData(data: any) {
+    const dataObj = new Date(data);
+    dataObj.setMonth(dataObj.getMonth() + 1);
+    const novaData = dataObj.toISOString().split('T')[0];
+    return novaData
+  }
 
   async add() {
     this.form.value.data = this.formatDate(this.form.value.data!);
@@ -150,11 +186,20 @@ export class DespesaComponent implements OnInit, AfterViewInit {
         this.alertComponent.showAlert("Alerta", "Despesa atualizada!");
         this.resetForm();
         this.despesaSelected = undefined;
-        
+
       } else {
+        if (!this.despesa.recorrente) {
+          this.despesa.status = true
+        }
         await this.despesaService.insert(this.despesa)
         this.alertComponent.showAlert("Sucesso", "Adicionado com sucesso!");
         this.resetForm();
+      }
+      if (this.despesa.recorrente && this.despesa.status) {
+        const dataProximaDespesa = this.recorrenciaData(this.despesa.data)
+        this.despesa.data = dataProximaDespesa
+        this.despesa.recorrente_ref = parseInt(this.despesa.id)
+        await this.despesaService.putRecorrencia(parseInt(this.despesa.id), this.despesa)
       }
     } catch (error) {
       this.alertComponent.showAlert("Erro", "Algo deu errado");
@@ -171,6 +216,7 @@ export class DespesaComponent implements OnInit, AfterViewInit {
       categoria: null,
       data: null,
       descricao: null,
+      status: false,
       valor: null
     });
     if (this.flatpickrInstance) {

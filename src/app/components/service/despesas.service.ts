@@ -12,6 +12,8 @@ export interface Despesa {
   user_id: string;
   categoria?: Categoria;
   categoria_id: string;
+  status: boolean;
+  recorrente_ref?: number;
 }
 interface DespesaState {
   despesas: Despesa[];
@@ -169,7 +171,36 @@ export class DespesasService {
     }
   }
 
-  async insert(despesa: Despesa): Promise<any> { // Use o tipo correto se houver um tipo específico para a resposta
+
+  async putRecorrencia(recorrente_ref: number, despesa: Despesa) {
+    try {
+      const {
+        data: { session },
+      } = await this._authService.session();
+      const { data } = await this._supabaseClient
+        .from('despesa')
+        .select(`*, categoria(*)`)
+        .eq('user_id', session?.user.id)
+        .eq('recorrente', true)
+        .eq('recorrente_ref', recorrente_ref)
+        .order('data', { ascending: false })
+        .returns<Despesa[]>();
+
+      if (data?.length == 0) {
+        this.insert(despesa)
+      }
+      // console.log(data)
+      // if (data && data.length > 0) {
+      //   console.log(data)
+      // }
+    } catch (error) {
+    }
+  }
+
+
+
+
+  async insert(despesa: Despesa): Promise<any> {
     try {
       const {
         data: { session },
@@ -182,6 +213,7 @@ export class DespesasService {
         categoria_id: despesa.categoria_id,
         data: despesa.data,
         valor: despesa.valor,
+        recorrente_ref: despesa.recorrente_ref,
       });
 
       if (error) {
