@@ -6,7 +6,7 @@ import { Categoria, CategoriasService } from '../service/categoria.service';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgFor } from '@angular/common';
 import { ModalService } from '../../shared/services/modal.service';
-import { AddComponent } from './add/add.component';
+import { AddComponent } from './categoria/add/add.component';
 import { AlertComponent } from "../../shared/components/alert/alert.component";
 import { Despesa, DespesasService } from '../service/despesas.service';
 import { InputMaskDirective } from '../../shared/directives/InputMaskDirective';

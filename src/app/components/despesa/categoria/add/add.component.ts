@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, Inject, inject, Input, OnInit, Optional, Output, ViewChild } from '@angular/core';
-import { ModalService } from '../../../shared/services/modal.service';
+import { ModalService } from '../../../../shared/services/modal.service';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Categoria, CategoriasService } from '../../service/categoria.service';
+import { Categoria, CategoriasService } from '../../../service/categoria.service';
 
 interface CategoriaForm {
   categoria: FormControl<string | null>;
