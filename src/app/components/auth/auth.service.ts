@@ -21,8 +21,8 @@ export class AuthService {
   signup(credentials: SignUpWithPasswordCredentials) {
     return this._supabase.auth.signUp(credentials);
   }
-  login(credentials: SignInWithPasswordCredentials) {
-    return this._supabase.auth.signInWithPassword(credentials);
+  async login(credentials: SignInWithPasswordCredentials) {
+    return await this._supabase.auth.signInWithPassword(credentials)
   }
   async signInWithGoogle() {
     const { data, error } = await this._supabase.auth.signInWithOAuth({
