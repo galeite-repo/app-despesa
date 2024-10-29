@@ -7,47 +7,32 @@ import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators 
 import { CommonModule, NgFor } from '@angular/common';
 import { ModalService } from '../../shared/services/modal.service';
 import { AddComponent } from './categoria/add/add.component';
-import { AlertComponent } from "../../shared/components/alert/alert.component";
+import { Alert, AlertComponent } from "../../shared/components/alert/alert.component";
 import { Despesa, DespesasService } from '../service/despesas.service';
 import { InputMaskDirective } from '../../shared/directives/InputMaskDirective';
 import { MoneyMaskDirective } from '../../shared/directives/MoneyMaskDirective';
 import { ChartComponent } from './chart/chart.component';
 import { DeleteComponent } from './delete/delete.component';
-import flatpickr from 'flatpickr';
-import { Portuguese } from 'flatpickr/dist/l10n/pt.js'; // Importe o idioma desejado
+import { DespesaRecorrenteComponent } from "./tab/despesa-list/despesa-list.component";
+import { DespesaFormComponent } from "./tab/despesa-form/despesa-form.component"; // Importe o idioma desejado
 
 
-interface DespesaForm {
-  recorrente?: FormControl<boolean | null>;
-  status?: FormControl<boolean | null>;
-  data?: FormControl<string | null>;
-  valor?: FormControl<number | null>;
-  descricao?: FormControl<string | null>;
-  categoria?: FormControl<Categoria | null>;
-  categoria_id?: FormControl<string | null>;
-}
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NavbarComponent, NgFor, AlertComponent, ReactiveFormsModule, CommonModule, FormsModule, InputMaskDirective, MoneyMaskDirective],
+  imports: [NavbarComponent, NgFor, AlertComponent, ReactiveFormsModule, CommonModule, FormsModule, InputMaskDirective, MoneyMaskDirective, DespesaRecorrenteComponent, DespesaFormComponent],
   templateUrl: './despesa.component.html',
   styleUrl: './despesa.component.scss'
 })
-export class DespesaComponent implements OnInit, AfterViewInit {
-  @ViewChild('datePicker') datePickerElement!: ElementRef;
-  flatpickrInstance: flatpickr.Instance | undefined
-  @ViewChild('dataInput') dataInput!: ElementRef;
-  @ViewChild('descricaoInput') descricaoInput!: ElementRef;
+export class DespesaComponent implements OnInit {
   selectedDate!: string;
 
   @ViewChild(AlertComponent) alertComponent!: AlertComponent;
   private modalService = inject(ModalService);
 
   toggleEye: boolean = false;
-  buscaDespesaFixa: string = '';
-  buscaDespesaGeral: string = '';
 
   despesa!: Despesa;
   despesaSelected?: Despesa;
@@ -65,23 +50,6 @@ export class DespesaComponent implements OnInit, AfterViewInit {
   mesSelecionado: any;
   anoSelecionado: any;
 
-  private formBuilder = inject(FormBuilder);
-  form = this.formBuilder.group<DespesaForm>({
-    descricao: this.formBuilder.control(null, Validators.required),
-    recorrente: this.formBuilder.control(false, Validators.required),
-    status: this.formBuilder.control(false, Validators.required),
-    categoria: this.formBuilder.control(null),
-    categoria_id: this.formBuilder.control(null, Validators.required),
-    data: this.formBuilder.control(null, Validators.required),
-    valor: this.formBuilder.control(null, Validators.required),
-  });
-
-  ngAfterViewInit(): void {
-    this.flatpickrInstance = flatpickr(this.datePickerElement.nativeElement, {
-      dateFormat: 'd-m-Y',
-      locale: Portuguese
-    });
-  }
 
   async ngOnInit() {
     this.selectedDate = '';
@@ -97,14 +65,6 @@ export class DespesaComponent implements OnInit, AfterViewInit {
 
   }
 
-  private focusOnDescricao() {
-    setTimeout(() => {
-      if (this.descricaoInput) {
-        this.descricaoInput.nativeElement.focus();
-      }
-    }, 0);
-  }
-
   toggleView() {
     this.toggleEye = !this.toggleEye;
     localStorage.setItem('toggleEye', JSON.stringify(this.toggleEye));
@@ -117,163 +77,26 @@ export class DespesaComponent implements OnInit, AfterViewInit {
     await this.loadData(this.mesSelecionado, this.anoSelecionado);
   }
 
-  filteredDespesaFixa() {
-    const term = this.buscaDespesaFixa.toLowerCase();
 
-    return this.despesaFixa.filter(item => {
-      const matchesDescricao = item.descricao.toLowerCase().includes(term);
-      const matchesCategoria = item.categoria?.categoria.toLowerCase().includes(term);
-      const matchesValor = item.valor.toString().includes(term);
-      const matchesData = item.data === this.buscaDespesaFixa;
-
-      return matchesDescricao || matchesCategoria || matchesValor || matchesData;
-    });
+  async onSubmitForm(msg: Alert) {
+    this.alertComponent.showAlert(msg);
+    await this.loadData(this.mesSelecionado, this.anoSelecionado);
+    this.despesaSelected = undefined
   }
 
-  filteredDespesaGeral() {
-    const term = this.buscaDespesaGeral.toLowerCase();
-
-    return this.despesaList.filter(item => {
-      const matchesDescricao = item.descricao.toLowerCase().includes(term);
-      const matchesCategoria = item.categoria?.categoria.toLowerCase().includes(term);
-      const matchesValor = item.valor.toString().includes(term);
-      const matchesData = item.data === this.buscaDespesaFixa;
-
-      return matchesDescricao || matchesCategoria || matchesValor || matchesData;
-    });
-  }
-
-
-
-  formatDate(dateString: string): string {
-    const [day, month, year] = dateString.split('-');
-    return `${year}-${month}-${day}`;
-  }
-  formatDateBR(dateString: string): string {
-    const [year, month, day] = dateString.split('-');
-    return `${day}-${month}-${year}`;
-  }
-
-  edit(despesa: Despesa) {
+  onEditItem(despesa: Despesa) {
     this.despesaSelected = despesa;
-    this.form.setValue({
-      categoria: this.despesaSelected.categoria!,
-      categoria_id: this.despesaSelected.categoria!.id,
-      descricao: this.despesaSelected.descricao,
-      data: this.formatDateBR(this.despesaSelected.data),
-      recorrente: this.despesaSelected.recorrente,
-      status: this.despesaSelected.status ?? false,
-      valor: this.despesaSelected.valor
-    })
-    this.focusOnDescricao();
   }
 
-  recorrenciaData(data: any) {
-    const dataObj = new Date(data);
-    dataObj.setMonth(dataObj.getMonth() + 1);
-    const novaData = dataObj.toISOString().split('T')[0];
-    return novaData
-  }
-
-  async add() {
-    this.form.value.data = this.formatDate(this.form.value.data!);
-    this.despesa = this.form.value as Despesa
-    try {
-      if (this.despesaSelected) {
-        this.despesa.id = this.despesaSelected.id
-        delete this.despesa.categoria
-        await this.despesaService.update(this.despesa)
-        this.alertComponent.showAlert("Alerta", "Despesa atualizada!");
-        this.resetForm();
-        this.despesaSelected = undefined;
-
-      } else {
-        if (!this.despesa.recorrente) {
-          this.despesa.status = true
-        }
-        await this.despesaService.insert(this.despesa)
-        this.alertComponent.showAlert("Sucesso", "Adicionado com sucesso!");
-        this.resetForm();
-      }
-      if (this.despesa.recorrente && this.despesa.status) {
-        const dataProximaDespesa = this.recorrenciaData(this.despesa.data)
-        this.despesa.data = dataProximaDespesa
-        this.despesa.recorrente_ref = parseInt(this.despesa.id)
-        await this.despesaService.putRecorrencia(parseInt(this.despesa.id), this.despesa)
-      }
-    } catch (error) {
-      this.alertComponent.showAlert("Erro", "Algo deu errado");
-
-    }
-    this.focusOnDescricao()
+  async onDeleteItem(msg: Alert) {
+    this.alertComponent.showAlert(msg);
     await this.loadData(this.mesSelecionado, this.anoSelecionado);
   }
-
-  resetForm(): void {
-    this.form.reset({
-      recorrente: false,
-      categoria_id: null,
-      categoria: null,
-      data: null,
-      descricao: null,
-      status: false,
-      valor: null
-    });
-    if (this.flatpickrInstance) {
-      this.flatpickrInstance.clear();
-    }
-  }
-
-  async deleteItem(item: Despesa) {
-    try {
-      await this.despesaService.delete(item.id)
-      this.alertComponent.showAlert("Alerta", "Despesa foi excluída.")
-      await this.loadData(this.mesSelecionado, this.anoSelecionado);
-    } catch (error) {
-      this.alertComponent.showAlert("Erro", "Algo deu errado");
-    }
-  }
-
-
-  async loadData(mes: number, ano: number) {
-    this.despesaList = [];
-    this.despesaFixa = [];
-    this.despesaGeral = [];
-    this.totalDespesa = 0;
-    this.totalDespesaFixa = 0;
-    await this.categoriaService.getAll();
-    await this.despesaService.getAllGeral(mes, ano);
-    await this.despesaService.getAll(mes, ano);
-    await this.despesaService.getAllFixas(mes, ano);
-    this.categoriaList = this.categoriaService.categorias();
-    this.despesaList = this.despesaService.despesas();
-    this.despesaGeral = this.despesaService.despesasGeral();
-    this.despesaFixa = this.despesaService.despesasFixas();
-    this.despesaList.map((item) => {
-      this.totalDespesa += item.valor
-    })
-    this.despesaFixa.map((item) => {
-      this.totalDespesaFixa += item.valor
-    })
-    this.despesaGeral.map((item) => {
-      this.totalGeral += item.valor
-    })
-    this.totalFinal = this.totalDespesa + this.totalDespesaFixa
-  }
-
-
-  openModalAdd(): void {
-    this.modalService.openModal({
-      component: AddComponent,
-      inputs: {
-        data: this.categoriaList,
-        onCreate: async () => {
-          this.alertComponent.showAlert("Sucesso", "Adicionado com sucesso!");
-          await this.loadData(this.mesSelecionado, this.anoSelecionado);
-        }
-      }
-    });
-  }
+  
+  async onCreateCategoria(msg: Alert){
+    this.alertComponent.showAlert(msg);
+    await this.loadData(this.mesSelecionado, this.anoSelecionado);
+}
 
   openChartModal(): void {
     this.modalService.openModal({
@@ -285,15 +108,60 @@ export class DespesaComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteModal(despesa: Despesa): void {
-    this.modalService.openModal({
-      component: DeleteComponent,
-      inputs: {
-        data: despesa,
-        onDelete: async (despesa: Despesa) => {
-          this.deleteItem(despesa)
-        }
-      }
-    });
+
+  async loadData(mes: number, ano: number) {
+    this.resetData();
+  
+    await this.loadCategorias();
+    await this.loadDespesas(mes, ano);
+  
+    this.calculateTotals();
+    this.calculateFinalTotal();
+  }
+  
+  // Reseta os dados das listas e totais
+  private resetData() {
+    this.despesaList = [];
+    this.despesaFixa = [];
+    this.despesaGeral = [];
+    this.totalDespesa = 0;
+    this.totalDespesaFixa = 0;
+    this.totalGeral = 0;
+  }
+  
+  // Carrega as categorias
+  private async loadCategorias() {
+    await this.categoriaService.getAll();
+    this.categoriaList = this.categoriaService.categorias();
+  }
+  
+  // Carrega as despesas geral, fixa e total
+  private async loadDespesas(mes: number, ano: number) {
+    await Promise.all([
+      this.despesaService.getAll(mes, ano),
+      this.despesaService.getAllGeral(mes, ano),
+      this.despesaService.getAllFixas(mes, ano),
+    ]);
+  
+    this.despesaList = this.despesaService.despesas();
+    this.despesaGeral = this.despesaService.despesasGeral();
+    this.despesaFixa = this.despesaService.despesasFixas();
+  }
+  
+  // Calcula os totais de cada lista de despesas
+  private calculateTotals() {
+    this.totalDespesa = this.calculateTotal(this.despesaList);
+    this.totalDespesaFixa = this.calculateTotal(this.despesaFixa);
+    this.totalGeral = this.calculateTotal(this.despesaGeral);
+  }
+  
+  // Calcula o total final
+  private calculateFinalTotal() {
+    this.totalFinal = this.totalDespesa + this.totalDespesaFixa;
+  }
+  
+  // Calcula o total de uma lista de despesas específica
+  private calculateTotal(despesas: Array<{ valor: number }>): number {
+    return despesas.reduce((total, item) => total + item.valor, 0);
   }
 }

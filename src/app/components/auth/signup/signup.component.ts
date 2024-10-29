@@ -46,7 +46,7 @@ export class AuthSignupComponent {
       if (error) {
         throw error; // Lança o erro para o bloco catch
       }
-      this.alertComponent.showAlert("Sucesso", "Usuário criado com sucesso.");
+      this.alertComponent.showAlert({ status: "Sucesso", mensagem: "Usuário Criado!" });
       await this._authService.login({
         email: this.form.value.email ?? '',
         password: this.form.value.password ?? '',
@@ -60,11 +60,11 @@ export class AuthSignupComponent {
       // Exibe uma mensagem mais específica com base no código de erro
       switch (errorCode) {
         case 'user_already_exists':
-          this.alertComponent.showAlert("Erro", "O usuário já está registrado.");
+          this.alertComponent.showAlert({ status: "Erro", mensagem: "O usuário já está registrado." });
           break;
         // Adicione mais casos conforme necessário
         default:
-          this.alertComponent.showAlert("Erro", errorMessage);
+          this.alertComponent.showAlert({ status: "Erro", mensagem: errorMessage });
           break;
       }
 

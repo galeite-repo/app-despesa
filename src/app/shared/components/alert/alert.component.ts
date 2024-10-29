@@ -1,6 +1,15 @@
 import { NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 
+
+export interface Alert {
+  status: AlertStatus;
+  mensagem: string;
+}
+
+type AlertStatus = 'Sucesso' | 'Alerta' | 'Erro';
+
+
 @Component({
   selector: 'app-alert',
   standalone: true,
@@ -29,11 +38,10 @@ export class AlertComponent implements OnInit {
     // O alerta não deve aparecer automaticamente
   }
 
-  showAlert(status: 'Sucesso' | 'Alerta' | 'Erro', message: string) {
-    this.status = status; // Atualiza o status do alerta
-    this.message = message; // Atualiza a mensagem do alerta
-    this.show = true; // Mostrar o alerta
-    // Auto-destruir o alerta após 3 segundos
+  showAlert(msg: Alert) {
+    this.status = msg.status; // Atualiza o status do alerta
+    this.message = msg.mensagem; 
+    this.show = true; 
     setTimeout(() => {
       this.show = false;
     }, 3000);

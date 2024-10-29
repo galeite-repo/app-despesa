@@ -40,18 +40,18 @@ export class LoginComponent {
     if (this.form.invalid) return;
 
     try {
-       const data = await this._authService.login({
+      const data = await this._authService.login({
         email: this.form.value.email ?? '',
         password: this.form.value.password ?? '',
       });
-      if(data.error){
-        this.alertComponent.showAlert("Erro", "Usuário ou senha inválidos");
-      }else{
+      if (data.error) {
+        this.alertComponent.showAlert({ status: "Erro", mensagem: "Usuário ou senha inválidos" });
+      } else {
         this._router.navigateByUrl('/');
       }
     } catch (error) {
       if (error instanceof Error) {
-        this.alertComponent.showAlert("Erro", "Usuário ou senha inválidos");
+        this.alertComponent.showAlert({ status: "Erro", mensagem: "Usuário ou senha inválidos" });
         console.error(error);
       }
     }

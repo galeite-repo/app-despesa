@@ -63,7 +63,7 @@ export class CategoriasService {
     }
   }
 
-  async insert(categoria: { categoria: string; }) {
+  async insert(categoria: Categoria) {
     try {
       const {
         data: { session },
@@ -80,7 +80,7 @@ export class CategoriasService {
     }
   }
 
-  async update(categoria: { categoria: string; id: string }) {
+  async update(categoria: Categoria) {
     try {
       await this._supabaseClient
         .from('categoria')

@@ -16,13 +16,13 @@ interface CategoriaForm {
   styleUrl: './add.component.scss'
 })
 export class AddComponent implements AfterViewInit {
-  @ViewChild('categoriaInput') categoriaInput!: ElementRef; // Referência ao input de categoria
+  @ViewChild('categoriaInput') categoriaInput!: ElementRef;
 
 
   constructor(
     private modalService: ModalService,
     @Inject("data") public data: any,
-    @Optional() @Inject('onCreate') public onCreate: () => void = () => { },
+    @Optional() @Inject('onCreate') public onCreate: (categoria: any) => void = () => { },
   ) {}
   private formBuilder = inject(FormBuilder);
 
@@ -41,22 +41,18 @@ export class AddComponent implements AfterViewInit {
 
 
   async add() {
+    this.categoria = this.form.value as Categoria
     if (this.categoriaSelected) {
-      await this.categoriaService.update({
-        categoria: this.form.value.categoria ?? '',
-        id: this.categoriaSelected.id,
-      })
+      this.categoria.id = this.categoriaSelected.id
+      await this.categoriaService.update(this.categoria)
     } else {
-      await this.categoriaService.insert({
-        categoria: this.form.value.categoria ?? ''
-      })
+      await this.categoriaService.insert(this.categoria)
     }
     this.form.reset();
-    this.onCreate()
+    this.onCreate(this.categoria)
     this.closeModal();
   }
   edit(categoria: Categoria) {
-    console.log(categoria)
     this.categoriaSelected = categoria;
     this.form.setValue({
       categoria: this.categoriaSelected.categoria

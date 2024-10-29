@@ -171,7 +171,6 @@ export class DespesasService {
     }
   }
 
-
   async putRecorrencia(recorrente_ref: number, despesa: Despesa) {
     try {
       const {
@@ -189,16 +188,9 @@ export class DespesasService {
       if (data?.length == 0) {
         this.insert(despesa)
       }
-      // console.log(data)
-      // if (data && data.length > 0) {
-      //   console.log(data)
-      // }
     } catch (error) {
     }
   }
-
-
-
 
   async insert(despesa: Despesa): Promise<any> {
     try {
@@ -210,6 +202,7 @@ export class DespesasService {
         user_id: session?.user.id,
         descricao: despesa.descricao,
         recorrente: despesa.recorrente,
+        status: despesa.status,
         categoria_id: despesa.categoria_id,
         data: despesa.data,
         valor: despesa.valor,
@@ -265,8 +258,6 @@ export class DespesasService {
       }));
     }
   }
-
-
 
   async delete(id: string) {
     try {
