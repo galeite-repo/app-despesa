@@ -13,7 +13,7 @@ import { Alert } from '../../../../shared/components/alert/alert.component';
   imports: [NgIf, FormsModule, NgFor, CommonModule],
   styleUrls: ['./despesa-list.component.scss']
 })
-export class DespesaRecorrenteComponent implements OnInit {
+export class DespesaListComponent implements OnInit {
   @Input() despesas: Despesa[] = [];
   @Input() toggleEye: boolean = false;
   @Output() onEdit = new EventEmitter<Despesa>();

@@ -13,7 +13,7 @@ import { InputMaskDirective } from '../../shared/directives/InputMaskDirective';
 import { MoneyMaskDirective } from '../../shared/directives/MoneyMaskDirective';
 import { ChartComponent } from './chart/chart.component';
 import { DeleteComponent } from './delete/delete.component';
-import { DespesaRecorrenteComponent } from "./tab/despesa-list/despesa-list.component";
+import { DespesaListComponent } from "./tab/despesa-list/despesa-list.component";
 import { DespesaFormComponent } from "./tab/despesa-form/despesa-form.component"; // Importe o idioma desejado
 
 
@@ -22,7 +22,7 @@ import { DespesaFormComponent } from "./tab/despesa-form/despesa-form.component"
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NavbarComponent, NgFor, AlertComponent, ReactiveFormsModule, CommonModule, FormsModule, InputMaskDirective, MoneyMaskDirective, DespesaRecorrenteComponent, DespesaFormComponent],
+  imports: [NavbarComponent, NgFor, AlertComponent, ReactiveFormsModule, CommonModule, FormsModule, InputMaskDirective, MoneyMaskDirective, DespesaListComponent, DespesaFormComponent],
   templateUrl: './despesa.component.html',
   styleUrl: './despesa.component.scss'
 })
